@@ -55,7 +55,7 @@
         <div flex="30">
         </div>
         <div style="text-align: right" flex>
-          <md-button md-no-ink class="md-primary" ng-click="searchByText(question.coursename)" ng-show="question.coursename">{{ question.coursename }}</md-button>
+          <md-button md-no-ink class="md-primary" ng-click="searchByText(question.coursename)" ng-show="question.coursename" style = "color : #F77">{{ question.coursename }}</md-button>
           <md-button md-no-ink class="md-primary" ng-repeat="tag in question.tags" ng-click="searchByText(tag)" >{{ tag }}</md-button>
         </div>
       </md-card-actions>
