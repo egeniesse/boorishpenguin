@@ -1,7 +1,5 @@
-angular.module('boorish.auth', [])
-
-.controller('AuthController', function ($scope, $location, Auth, $window) {
-  $scope.user = {};
+angular.module('boorish.login', [])
+.controller('loginController', function($scope, $state, $location, Auth) {
 
   $scope.signin = function () {
     Auth.setUser().then(function() {

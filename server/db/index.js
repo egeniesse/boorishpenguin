@@ -1,12 +1,14 @@
 var Sequelize = require('sequelize');
 
-var database = process.env.DATABASE || 'jmuspkeyvjzsvvwp';
-var dbUser = process.env.DBUSER || 'htmaaabw4pe3k9ja';
+var database = process.env.DATABASE || 'townhall';
+var dbUser = process.env.DBUSER || 'root';
+// var dbHost = process.env.DATABASE_URL || 'localhost';
+var dbHost = process.env.DBHOST || 'localhost';
 var dbPass = process.env.DBPASS;
-var dbHost = process.env.DBHOST || 'jw0ch9vofhcajqg7.cbetxkdyhwsb.us-east-1.rds.amazonaws.com';
 
 var db = new Sequelize(database, dbUser, dbPass, {
-  host: dbHost
+  host: dbHost,
+  username: dbUser
 });
 
 var User = db.define('User', {
@@ -35,7 +37,8 @@ var User = db.define('User', {
     defaultValue: 0
   },
   email: Sequelize.STRING,
-  picture: Sequelize.STRING
+  picture: Sequelize.STRING,
+  google_id: Sequelize.STRING
 }, {
   timestamps: false
 });
@@ -47,7 +50,12 @@ var Tag = db.define('Tag', {
 });
 
 var Course = db.define('Course', {
-  name: Sequelize.STRING
+  name: Sequelize.STRING,
+  isActive : {
+    type: Sequelize.BOOLEAN,
+    allowNull: false,
+    defaultValue: true
+  }
 }, {
   timestamps: false
 });
@@ -55,7 +63,11 @@ var Course = db.define('Course', {
 var Post = db.define('Post', {
   title: Sequelize.STRING,
   text: Sequelize.STRING,
-  //when teacher confirms answer is correct
+  tags: {
+    type: Sequelize.STRING,
+    allowNull: true,
+    defaultValue: null,
+  },
   isAnswerType: {
     type: Sequelize.BOOLEAN,
     allowNull: false,
@@ -66,12 +78,7 @@ var Post = db.define('Post', {
     allowNull: false,
     defaultValue: false
   },
-  upvotes: {
-    type: Sequelize.INTEGER,
-    allowNull: false,
-    defaultValue: 0
-  },
-  downvotes: {
+  votes: {
     type: Sequelize.INTEGER,
     allowNull: false,
     defaultValue: 0
@@ -96,15 +103,21 @@ var Post = db.define('Post', {
     allowNull: false,
     defaultValue: false
   },
-  createdAt: {
-    type: Sequelize.DATE,
-    defaultValue: Sequelize.fn('NOW')
-  },
-  updatedAt: Sequelize.DATE
-});
+  isDeleted: {
+   type: Sequelize.BOOLEAN,
+   defaultValue: false
+ },
+//   createdAt: {
+//     type: Sequelize.DATE,
+//     defaultValue: db.fn('NOW')
+//   },
+//   updatedAt: Sequelize.DATE
+}
+);
 
-var Like = db.define('Like', {
-  idPositive: {
+var Votes = db.define('Votes', {
+ 
+  isPositive: {
    type: Sequelize.BOOLEAN,
     allowNull: false,
     defaultValue: false,
@@ -128,8 +141,8 @@ Course.hasMany(Post);
 Post.belongsTo(Course);
 Post.hasMany(Post, {as: 'Responses', foreignKey: 'QuestionId'});
 Post.hasMany(Post, {as: 'Comments', foreignKey: 'ResponseId'});
-Post.belongsToMany(User, {as: 'Vote', through: 'Like'});
-User.belongsToMany(Post, {through: 'Like'});
+Post.belongsToMany(User, {as: 'Opinions', through: 'Votes'});
+User.belongsToMany(Post, {through: 'Votes'});
 
 User.sync()
 .then(function() {
@@ -142,11 +155,11 @@ User.sync()
   return Post.sync();
 })
 .then(function() {
-  return Like.sync();
+  return Votes.sync();
 });
 
 exports.User = User;
 exports.Course = Course;
 exports.Tag = Tag;
 exports.Post = Post;
-exprots.Like = Like;
+exports.Votes = Votes;

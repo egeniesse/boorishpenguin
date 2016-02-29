@@ -1,5 +1,6 @@
 var db = require('../db/index.js');
 var User = db.User;
+var PostCtrl = require('./postController.js');
 
 module.exports = {
   allUsers: function(req, res) {
@@ -14,9 +15,6 @@ module.exports = {
           name: user.name,
           pendingTeacher: user.pendingTeacher,
           isAdmin: user.isAdmin,
-          //TODO: reverse first name, last name convention
-          name_first: user.name_last,
-          name_last: user.name_first,
           email: user.email,
           reputation: user.reputation,
           image: user.image
@@ -40,9 +38,6 @@ module.exports = {
         name: user.name,
         pendingTeacher: user.pendingTeacher,
         isAdmin: user.isAdmin,
-        //TODO: last name/first name
-        name_first: user.name_last,
-        name_last: user.name_first,
         email: user.email,
         reputation: user.reputation,
         image: user.image
@@ -54,10 +49,11 @@ module.exports = {
     });
   },
 
-  newUser: function(user) {
+  newUser: function(req, res, next) {
+    var user = req.body;
     User.create(user)
     .then(function(newUser) {
-      return newUser;
+      res.status(200).json(newUser);
     });
   },
 
@@ -73,26 +69,30 @@ module.exports = {
     });
   },
 
-  isUserTeacher: function(uname, callback) {
-    User.find({
-      where: {
-        username: uname
-      }
-    })
-    .then(function(user) {
-      callback(user.isTeacher);
-      return;
-    });
+  getFullProfile: function(req, res, next){
+    var userId = req.params.id;
+    var result = {profile: null, questions: null, answers: null};
+
+    User.findById(userId)
+      .then(function(user) {
+        result.profile = user;
+        PostCtrl.allPosts({isQuestionType: true, userId: userId}, function(userQuestions){
+          result.questions = userQuestions.results;
+          PostCtrl.allPosts({isAnswerType: true, userId: userId}, function(userAnswers){
+            result.answers = userAnswers.results;
+            res.status(200).json(result);
+          });
+        });
+      });
   },
-  isUserAdmin: function(uname, callback) {
-    User.find({
-      where: {
-        username: uname
-      }
-    })
-    .then(function(user) {
-      callback(user.isAdmin);
-      return;
-    });
+
+  becomeTeacherRequest: function(req, res, next){
+    var userId = req.body.userId;
+    User.findById(userId)
+      .then(function(user) {
+        user.pendingTeacher = true;
+        user.save();
+        res.sendStatus(200);
+      });
   }
 };

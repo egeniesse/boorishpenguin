@@ -1,0 +1,39 @@
+.picture {
+  width: 50px;
+}
+
+.questionHeader {
+  height: 50px;
+}
+
+.mainDiv {
+
+background: url('school.jpg') no-repeat center center fixed;
+-webkit-background-size: cover;
+-moz-background-size: cover;
+-o-background-size: cover;
+background-size: cover;
+}
+
+
+.questionTop {
+  background-color: #E2D2EA;
+  width: 100%;
+}
+
+.tolowercase {
+  text-transform: lowercase;
+}
+
+.tocapitalize {
+  text-transform: capitalize;
+}
+
+.answer-form{
+     width: 100%;
+     display:block;
+     float:left;
+  }
+.answer-input{
+   width: 100%;
+}

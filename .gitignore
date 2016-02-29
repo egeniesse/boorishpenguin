@@ -2,6 +2,11 @@
 .idea/
 *.iml
 
+### SERVER ###
+.swp
+server/controllers/oldquestionController.js
+server/controllers/oldAnswerController.js
+server/config/apikeys.js
 
 ### NODE ###
 build/
@@ -9,5 +14,11 @@ dist/
 node_modules/
 bower_components/
 lib/
+client/lib
 
 */.DS_Store
+.DS_Store
+client/app/.DS_Store
+
+### API KEYS ###
+./server/config/apikeys.js
